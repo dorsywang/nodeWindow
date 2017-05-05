@@ -1,0 +1,25 @@
+{
+  "name": "nodewindow",
+  "version": "1.0.0",
+  "description": "run browser code in node ",
+  "main": "nodeWindow.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dorsywang/nodeWindow.git"
+  },
+  "author": "dorsywang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dorsywang/nodeWindow/issues"
+  },
+  "homepage": "https://github.com/dorsywang/nodeWindow#readme",
+  "dependencies": {
+    "events": "^1.1.1"
+  }
+}
