@@ -1,10 +1,11 @@
 var Tree = require('./tree');
+var compileCode = require('./compileCode');
 
 var preParsedMap = {};
 
 class ParseDom{
     parse(html, window){
-        this.parseHTML(html, window);
+        return this.parseHTML(html, window);
     }
 
     parseHTML(htmlStr, window){
@@ -12,6 +13,7 @@ class ParseDom{
 
         var docTree = new Tree();
 
+        var currNode;
         var preParedQueue;
         if(preParsedMap[htmlStr]){
         }else{
@@ -20,7 +22,6 @@ class ParseDom{
 
         preParedQueue = preParsedMap[htmlStr];
 
-        console.log('preparse', preParedQueue);
 
         for(var i = 0; i < preParedQueue.length; i ++){
             var item = preParedQueue[i];
@@ -31,8 +32,6 @@ class ParseDom{
 
             if(tagType === "startTag"){
                 var node = document.createElement(tagName);
-                /*
-                node.nodeType = node.ELEMENT_NODE;
                 
                 if(tagName === "head"){
                     document.head = node;
@@ -45,14 +44,14 @@ class ParseDom{
                 if(tagName === "html"){
                     document.documentElement = node;
                 }
-                */
+
+                currNode = node;
 
 
                 docTree.push(node);
                 //_allNode.push(node);
             }else if(tagType === "attrs"){
 
-                /*
                 var match = item.match;
                 if(match === ">"){
                     if(currNode.getAttribute('type') && (currNode.getAttribute("type") + '').toLowerCase() !== "text/javascript"){
@@ -73,50 +72,41 @@ class ParseDom{
                     var attrValue = item.attrValue;
 
                     if(attrName === "id"){
-                        _idMap[attrValue] = currNode;
+                       // _idMap[attrValue] = currNode;
                     }
 
                     currNode.setAttribute(attrName, attrValue);
                 }
-                */
             }else if(tagType === "textTag"){
-                /*
                 var text = item.nodeValue;
-
-                node = new domEle.Element();
-                node.nodeType = 3;
-                node.nodeValue = text || '';
-
+                var node = document.createTextNode(text);
                 docTree.push(node);
 
                 currNode = node;
 
+                
                 if(item.checkParentScript){
                       if(node.parentNode.tagName === "script"){
                           if(node.parentNode.getAttribute('type') && (node.parentNode.getAttribute("type") + '').toLowerCase() !== "text/javascript"){
                             }else{
                                 try{
-                                    windowSpace.runCode(text);
-                                    //vm.runInThisContext(text, "vm");
+                                    compileCode.runCode(text, window);
                                 }catch(e){
                                 }
                             }
                         }
 
                 }
-                */
 
                 if(item.backUp){
                     docTree.backUp();
                 }
             }else if(tagType === "endTag"){
-                    /*
                     // 如果是一个endTag 将一个空结点做为tag的子结点
-                    var node = new domEle.Element();
-                    node.nodeType = 3;
-                    node.nodeValue = '';
+                    var node = document.createElement();
                     docTree.push(node);
-                    */
+
+                    currNode = node;
 
                     if(item.backUp){
                         docTree.backUp();
@@ -125,7 +115,9 @@ class ParseDom{
             }
         }
 
-        console.log(docTree);
+        return docTree;
+
+        //console.log(docTree);
 
 
     }

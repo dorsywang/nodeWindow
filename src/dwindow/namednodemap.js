@@ -1,3 +1,4 @@
+var Text = require('./text');
 
 class NamedNodeMap{
     constructor(node){
@@ -7,6 +8,7 @@ class NamedNodeMap{
 
     setNamedItem(name, value){
         var attr = this.getNamedItem(name);
+        var _this = this;
 
         if(attr){
             attr.name = name;
@@ -21,14 +23,10 @@ class NamedNodeMap{
                 name: name,
                 value: value || '',
                 ownerElment: this.ownerElment,
-                nodeType: Element.prototype.ATTRIBUTE_NODE,
+                nodeType: this.ownerElment.ATTRIBUTE_NODE,
                 nodeValue: value || '',
                 childNodes: function(){
-                    var node = new Element();
-                    node.nodeType = node.TEXT_NODE;
-                    node.value = value || '';
-                    node.nodeValue = value || '';
-
+                    var node = _this.ownerElment.ownerDocument.createTextNode();
                     return [node];
                 }(),
 
