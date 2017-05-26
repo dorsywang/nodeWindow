@@ -4,6 +4,7 @@
 var HTMLElement = require('./htmlelement');
 var Node = require('./node');
 var Text = require('./text');
+var Comment = require('./comment');
 
 var ElementClassDeclaredMap = {
     canvas: 'HTMLCanvasElement'
@@ -27,7 +28,7 @@ class Document extends Node{
 
         var node;
 
-        tagName = tagName || '';
+        tagName = (tagName || '').toUpperCase();
         if(ElementClassDeclaredMap[tagName]){
             var elementClass = require('./' + ElementClassDeclaredMap[tagName].toLowerCase());
             node = new elementClass(tagName);
@@ -41,12 +42,25 @@ class Document extends Node{
         return node;
     }
 
+    createDocumentFragment(){
+        var node = this.createElement('fragment');
+
+        return node;
+    }
+
     createTextNode(text){
         return new Text(text);
     }
 
+    createComment(text){
+        return new Comment(text);
+    }
+
     get defaultView(){
         return this.__defaultView;
+    }
+
+    getElementById(){
     }
 }
 

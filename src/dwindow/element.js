@@ -92,9 +92,10 @@ class Element extends Node{
             var document = this.ownerDocument;
             var window = document.defaultView || {};
 
-            var docTree = new ParseDom().parse(val, window);
+            var result = new ParseDom().parseHTMLFragment(val, window);
+            var docTree = result.docTree;
 
-            this.childNodes = docTree._tree;
+            this.childNodes = docTree._tree.childNodes;
             for(var i = 0; i < this.childNodes.length; i ++){
                 this.childNodes[i].parentNode = this;
             }
@@ -142,8 +143,25 @@ class Element extends Node{
             
             return attrStr;
     }
+
+    set outerHTML(val){
+        var document = this.ownerDocument;
+        var div =  document.createElement('div');
+
+        div.innerHTML = val;
+
+        if (this.parentNode) {
+            while (div.childNodes[0]) {
+                this.parentNode.insertBefore(div.childNodes[0], this);
+            }
+
+            this.parentNode.removeChild(this);
+        }
+
+    }
+
     get outerHTML(){
-        var tagName = this.tagName;
+        var tagName = (this.tagName || '').toLowerCase();
         var selfCloseTagReg = /br|hr|img|link|meta/;
 
         var isSelfEnd = selfCloseTagReg.test(tagName);
@@ -152,7 +170,6 @@ class Element extends Node{
             return this.nodeValue || "";
         }
 
-        debugger;
         var attrStr = this._getAttributeString();
 
 
@@ -202,6 +219,10 @@ class Element extends Node{
 
         
         this.attributes.setNamedItem(attr, val);
+    }
+
+    removeAttribute(attr){
+        this.attributes.removeNamedItem(attr);
     }
 
 }

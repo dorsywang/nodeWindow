@@ -8,7 +8,7 @@ class ParseDom{
         return this.parseHTML(html, window);
     }
 
-    parseHTML(htmlStr, window){
+    parseHTMLFragment(htmlStr, window){
         var document = window.document;
 
         var docTree = new Tree();
@@ -22,6 +22,8 @@ class ParseDom{
 
         preParedQueue = preParsedMap[htmlStr];
 
+        var headNode, bodyNode, htmlNode;
+
 
         for(var i = 0; i < preParedQueue.length; i ++){
             var item = preParedQueue[i];
@@ -34,15 +36,15 @@ class ParseDom{
                 var node = document.createElement(tagName);
                 
                 if(tagName === "head"){
-                    document.head = node;
+                   headNode = node;
                 }
 
                 if(tagName === "body"){
-                    document.body = node;
+                    bodyNode = node;
                 }
 
                 if(tagName === "html"){
-                    document.documentElement = node;
+                   htmlNode = node;
                 }
 
                 currNode = node;
@@ -101,6 +103,17 @@ class ParseDom{
                 if(item.backUp){
                     docTree.backUp();
                 }
+            }else if(tagType === "commentTag"){
+                var text = item.nodeValue;
+                var node = document.createComment(text);
+
+                docTree.push(node);
+
+                currNode = node;
+
+                if(item.backUp){
+                    docTree.backUp();
+                }
             }else if(tagType === "endTag"){
                     // 如果是一个endTag 将一个空结点做为tag的子结点
                     var node = document.createElement();
@@ -115,10 +128,59 @@ class ParseDom{
             }
         }
 
-        return docTree;
+
+        return {
+            headNode: headNode,
+            bodyNode: bodyNode,
+            htmlNode: htmlNode,
+            docTree: docTree
+        };
+    }
+
+    parseHTMLDocument(htmlStr, window){
+        var document = window.document;
+
+        var result = this.parseHTMLFragment(htmlStr, window);
+
+        var docTree = result.docTree;
+
+        var htmlNode = result.htmlNode || document.createElement('html');
+        var headNode = result.headNode || document.createElement('head');
+
+        var bodyNode;
+
+        if(result.bodyNode){
+            bodyNode = result.bodyNode;
+        }else{
+            var bodyNode = document.createElement('body');
+            bodyNode.childNodes = docTree._tree.childNodes;
+
+            bodyNode.childNodes.map(function(item){
+                item.parentNode = bodyNode;
+            });
+        }
+
+        var tree = new Tree();
+        tree.push(document);
+        tree.goNext();
+
+        tree.push(htmlNode);
+
+        tree.goNext();
+
+        tree.push(headNode);
+        tree.push(bodyNode);
+
+        document.documentElement = htmlNode;
+        document.head = headNode;
+        document.body = bodyNode;
+
+
+        // check docTree
+
+        return document;
 
         //console.log(docTree);
-
 
     }
     
@@ -126,10 +188,10 @@ class ParseDom{
         // 预处理
         // 去掉注释
         // @todo 自封口
-        var commentsReg = /<!--[\s\S]*?-->/g;
+       // var commentsReg = /<!--[\s\S]*?-->/g;
 
 
-        htmlStr = htmlStr.replace(commentsReg, "");
+        //htmlStr = htmlStr.replace(commentsReg, "");
 
         // 对转义字符的处理
         var escapeCharReg = /\\(.)/g;
@@ -170,7 +232,7 @@ class ParseDom{
 
         //var tagReg = /\s*<(\/?)([^>\s]+)([^>]*)>/g;
 
-         var tagReg = /<([^\s\/>]+)|<(\/)([^\s>]+)>|([^<]+)/g;
+         var tagReg = /<\!\-\-|<([^\s\/>]+)|<(\/)([^\s>]+)>|([^<]+)/g;
 
         var attrReg = />|\/>|([^\s=]+)=(?:"([^"]*)"|'([^']*)'|([^\s"']+))/g;
 
@@ -232,7 +294,9 @@ class ParseDom{
 
             // 如果是tag 判断type
             if(currReg === tagReg){
-                if(result[1]){
+                if(result[0] === '<!--'){
+                    tagType = "commentTag";
+                }else if(result[1]){
                     tagType = "startTag";
                 }else if(result[2] === "/"){
                     tagType = "endTag";
@@ -243,6 +307,8 @@ class ParseDom{
                 tagType = "attrs";
             }else if(currReg.type === "mixableTagCloseReg"){
                 tagType = "mixableTagCloseReg";
+            }else if(currReg.type === "commentEndTag"){
+                tagType = "commentEndTag";
             }
 
             if(tagType === "startTag"){
@@ -344,6 +410,29 @@ class ParseDom{
                     }
 
                     codeProcessQueue.push(codeProcessed);
+            }else if(tagType === "commentTag"){
+                var closeReg = /\-\->/g;
+                closeReg.type = "commentEndTag";
+
+                setCurrTag(closeReg);
+            }else if(tagType === "commentEndTag"){
+                var start = lastIndex;
+                var len = currReg.lastIndex - result[0].length - start;
+
+                var text = htmlStr.substr(start, len);
+
+                codeProcessed = {
+                    tagType: "commentTag",
+                    checkParentScript: false,
+                    nodeValue: text,
+                    backUp: 0
+                };
+
+                currNode = codeProcessed;
+
+                setCurrTag(tagReg);
+
+                codeProcessQueue.push(codeProcessed); 
             }else if(tagType === "mixableTagCloseReg"){
                 var start = lastIndex;
                 var len = currReg.lastIndex - result[0].length - start;

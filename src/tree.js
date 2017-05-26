@@ -1,56 +1,39 @@
 class Tree{
     constructor(){
-        this._tree = [];
+        this._tree = {
+            name: "ROOT",
+            childNodes: []
+        };
+
         this._idMap = {};
         this._allNode = [];
 
-        this._currNodesArr = null;
-
-        this._currNodesArr = this._tree;
-
-        this._currNode;
+        this._currParentNode = this._tree;
     }
 
-     goNext(){
-        if(! this._currNode.childNodes){
-            this._currNode.childNodes = [];
+    goNext(){
+        var parentNode = this._currParentNode;
+
+
+        var lastChild =parentNode.childNodes[parentNode.childNodes.length - 1];
+
+        if(lastChild){
+            this._currParentNode = lastChild;
+        }else{
+            throw new Error('tree goNext has no child');
         }
-
-        this._currNodesArr = this._currNode.childNodes;
-
-        this._currNodeParent = this._currNode;
-
+        
     }
 
     push(node){
-        this._currNodesArr.push(node);
-        this._currNode = node;
+        node.parentNode = this._currParentNode;
 
-        if(this._currNodeParent){
-            node.parentNode = this._currNodeParent;
-        }else{
-            node.parentNode = {
-                name: "ROOT",
-                childNodes: this._tree
-            };
-        }
+        this._currParentNode.childNodes.push(node);
     }
 
     // 回溯
     backUp(){
-        this._currNode = this._currNode.parentNode;
-        this._currNodeParent = this._currNode.parentNode;
-
-        //console.log(this._currNode.parentNode, 'parentNode');
-        try{
-            if(! this._currNode.parentNode.childNodes){
-                this._currNode.parentNode.childNodes = [];
-            }
-
-            this._currNodesArr = this._currNode.parentNode.childNodes;
-        }catch(e){
-            //console.log(this._currNode, 'parentNode');
-        }
+        this._currParentNode = this._currParentNode.parentNode;
     }
 
     getNodeById(id){

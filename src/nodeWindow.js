@@ -26,7 +26,7 @@ class NodeWindow{
         var window = new Window(browserEnv);
         var parsor = new ParseDom(window);
 
-        parsor.parse(html, window);
+        parsor.parseHTMLDocument(html, window);
 
         return window;
     

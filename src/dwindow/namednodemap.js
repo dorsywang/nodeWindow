@@ -6,6 +6,29 @@ class NamedNodeMap{
         this.ownerElment = node;
     }
 
+    removeNamedItem(name){
+         var index = -1;
+         for(var i in this){
+            if(this.hasOwnProperty(i)){
+                var item = this[i];
+
+                if(item.name == name){
+                    index = Number(i);
+                    break;
+                }
+            }
+        }
+
+        if(! isNaN(index) && index > -1){
+            delete this[index];
+            this.length --;
+
+            for(var i = index; i < this.length; i ++){
+                this[i] = this[i + 1];
+            }
+        }
+    }
+
     setNamedItem(name, value){
         var attr = this.getNamedItem(name);
         var _this = this;

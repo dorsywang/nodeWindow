@@ -47,7 +47,7 @@ class Node extends EventTarget{
     }
 
     get nodeName(){
-         return (this.tagName || "").toUpperCase();
+         return this.tagName;
     }
 
 
@@ -56,15 +56,27 @@ class Node extends EventTarget{
     }
 
     // @todo 这个参数有问题
-    cloneNode(){
+    cloneNode(deep){
         if(this.nodeType === this.TEXT_NODE){
             var node = this.ownerDocument.createTextNode(this.nodeValue);
             return node;
         }
 
+        if(this.nodeType === this.COMMENT_NODE){
+            var node = this.ownerDocument.createComment(this.nodeValue);
+            return node;
+        }
+
+
         var node = this.ownerDocument.createDocumentFragment();
 
-        node.innerHTML = "<" + this.tagName + " " + this._getAttributeString() + "></" + this.tagName + ">";
+        var tagName = this.tagName && this.tagName.toLowerCase();
+
+        if(deep){
+            node.innerHTML = "<" + tagName + " " + this._getAttributeString() + ">" + this.innerHTML + "</" + tagName + ">";
+        }else{
+            node.innerHTML = "<" + tagName + " " + this._getAttributeString() + "></" + tagName + ">";
+        }
 
         return node.childNodes[0];
      }
@@ -112,6 +124,16 @@ class Node extends EventTarget{
             return this.childNodes.length;
        }
 
+       removeChild(node){
+
+          for(var i = 0; i < this.childNodes.length; i ++){
+                if(this.childNodes[i] === node){
+                    this.childNodes.splice(i, 1);
+                    break;
+                }
+            }
+        }
+
 
        
         insertBefore(newNode, oldNode){
@@ -140,19 +162,21 @@ class Node extends EventTarget{
                 return flag;
             };
 
-            var isInDocument = checkInDocument(this);
+         //   var isInDocument = checkInDocument(this);
 
             // 如果是frament 则将子元素添加进去
-            if(newNode.tagName === "fragment"){
+            if((newNode.tagName || '').toLowerCase() === "fragment"){
                 Array.prototype.splice.apply(this.childNodes, [i, 0].concat(newNode.childNodes));
 
                 for(var i = 0; i < newNode.childNodes.length; i ++){
                     newNode.childNodes[i].parentNode = this;
 
                     // 这里有待完善
+                    /*
                     if(isInDocument){
                         newNode.childNodes[i].getIdMap(window.DOMTREE._idMap);
                     }
+                    */
                 }
 
                 // 置空子元素
@@ -168,11 +192,14 @@ class Node extends EventTarget{
                 this.childNodes.splice(i, 0, newNode);
 
                 // 这里有待完善
+                /*
                 if(isInDocument){
                     newNode.getIdMap(window.DOMTREE._idMap);
                 }
+                */
             }
 
+            /*
             if(newNode.tagName === "script"){
                 if(newNode.src){
                     var content = window.drequire(newNode.src, function(){
@@ -186,6 +213,7 @@ class Node extends EventTarget{
                     }
                 }
             }
+            */
 
             return newNode;
 

@@ -1,4 +1,20 @@
 var assert = require('assert');
+var chai = require('chai');
+
+if(typeof describe === 'undefined'){
+    describe =  function(name, func){
+        console.log(name);
+
+        func && func();
+    };
+
+    it = function(name, func){
+        console.log(name);
+        func && func();
+    };
+}
+
+var ParseDom = require("./../src/parseDom");
 
 var NodeWindow = require("./../src/nodeWindow");
 var nodeWindow  = new NodeWindow();
@@ -9,7 +25,7 @@ var window = nodeWindow.runHTML(`
         </head>
 
         <body>
-            <div>xxxxxxxxxxxxxxxxxx</div>
+            <div id="id1">xxxxxxxxxxxxxxxxxx</div>
             <script type="text/javascript">console.log('ok')</script>
         </body>
     </html>
@@ -17,12 +33,35 @@ var window = nodeWindow.runHTML(`
 
 var document = window.document;
 
+describe('preParseDom', function(){
+  describe('commentNode', function() {
+    it('should return commentNode', function() {
+        var htmlStr = "<!--sadfasdfasdfasdfsadfas<div>--><div>sadfsadf</div>";
+
+        var parseDom = new ParseDom();
+        var nodes = parseDom.preParse(htmlStr);
+
+         assert.equal('commentTag', nodes[0].tagType);
+    });
+  });
+
+});
+
 describe('Element', function() {
   
   describe('innerHTML', function() {
     it('should return correct html with attributes', function() {
         var div = document.createElement('div');
         var html = '<img src="http://www.qq.com" /><div data-click="</div">test</div>';
+        div.innerHTML = html;
+
+        var innerHTML = div.innerHTML;
+        assert.equal(html, innerHTML);
+    });
+
+    it('should return correct html', function() {
+        var div = document.createElement('div');
+        var html = '<div><!--<div>sdafasdf</div>--></div><div soda-pic="{{2}}%"></div>';
         div.innerHTML = html;
 
         var innerHTML = div.innerHTML;
@@ -57,11 +96,11 @@ describe('Element', function() {
     it('should return correct tagName', function() {
         var div = document.createElement('div');
 
-        assert.equal('div', div.tagName);
+        assert.equal('DIV', div.tagName);
     });
   });
 
- describe('outerHTML', function() {
+ describe('get outerHTML', function() {
     it('should return correct outerHTML', function() {
         var div = document.createElement('div');
 
@@ -69,6 +108,22 @@ describe('Element', function() {
 
 
         assert.equal('<div><img /><div class="div"></div></div>', div.outerHTML);
+    });
+  });
+
+ describe('set outerHTML', function() {
+    it('should return correct outerHTML', function() {
+        var div = document.createElement('div');
+
+        div.innerHTML = '<div><span>dsafdsf</span></div>';
+
+        var child = div.childNodes[0];
+
+        var outerHTML = '<p>aaaaa</p>';
+        child.outerHTML = outerHTML;
+
+
+        assert.equal(outerHTML, div.childNodes[0].outerHTML);
     });
   });
 
@@ -93,5 +148,69 @@ describe('Element', function() {
         assert.equal('background-color: red;', div.getAttribute('style'));
     });
   });
+
+ describe('getCommentNode', function() {
+    it('should return correct node', function() {
+        var div = document.createElement('div');
+
+        div.innerHTML = "<!--sadf<div>sadfsadf--><p>dsafasdf</p>";
+
+        var child = div.childNodes[0];
+          assert.equal('#comment', child.nodeName);
+
+    });
+
+    it('should return comment html', function() {
+        var div = document.createElement('div');
+
+        var html = "<!--sadf<div>sadfsadf--><p>dsafasdf</p>";
+        div.innerHTML  = html;
+
+          assert.equal(html, div.innerHTML);
+
+    });
+  });
+
+  describe('insertBefore', function() {
+    it('should return correct element', function() {
+        var div = document.createElement('div');
+
+        div.innerHTML = "<p id='test'></p>";
+
+        var div2 = document.createElement('div');
+
+        div.insertBefore(div2, div.childNodes[0]);
+        console.log(div.childNodes[0].tagName);
+        assert.equal('DIV', div.childNodes[0].tagName);
+        assert.equal('P', div.childNodes[1].tagName);
+
+
+    });
+
+   it('append: should return correct element', function() {
+        var div = document.createElement('div');
+
+        div.innerHTML = "<p id='test'></p>";
+
+        var div2 = document.createElement('div');
+
+        div.appendChild(div2);
+
+        assert.equal('DIV', div.childNodes[1].tagName);
+
+
+
+
+   });
+  });
+
+  describe('getElementById', function() {
+    it('should return correct element with id', function() {
+        var el = document.getElementById('id1');
+        chai.expect(el).to.exist;
+
+    });
+  });
+  
 });
 

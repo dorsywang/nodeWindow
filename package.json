@@ -2,7 +2,7 @@
   "name": "nodewindow",
   "version": "1.0.0",
   "description": "run browser code in node ",
-  "main": "nodeWindow.js",
+  "main": "./src/nodeWindow.js",
   "directories": {
     "test": "test"
   },
@@ -23,6 +23,7 @@
     "events": "^1.1.1"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "mocha": "^3.3.0"
   }
 }
