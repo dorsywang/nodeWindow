@@ -9,6 +9,10 @@ class HTMLElement extends Element{
     }
 
     blur(){
+        console.warn('blur is not realised');
+    }
+
+    unblur(){
     }
 
     click(){

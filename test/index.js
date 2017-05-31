@@ -277,6 +277,19 @@ describe('Element', function() {
 
     });
   });
+
+  describe('blur & unblur', function() {
+
+    it('should exists and show message', function() {
+        expect(document.blur).to.be.empty;
+        expect(document.unblur).to.be.empty;
+        expect(document.body.blur).to.be.exist;
+        expect(document.body.unblur).to.be.exist;
+
+        assert.equal('function', typeof document.body.blur);
+        assert.equal('function', typeof document.body.unblur);
+    });
   
+  });
 });
 
