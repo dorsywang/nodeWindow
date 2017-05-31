@@ -1,5 +1,6 @@
-var assert = require('assert');
 var chai = require('chai');
+var expect = chai.expect;
+var assert = chai.assert;
 
 if(typeof describe === 'undefined'){
     describe =  function(name, func){
@@ -19,14 +20,16 @@ var ParseDom = require("./../src/parseDom");
 var NodeWindow = require("./../src/nodeWindow");
 var nodeWindow  = new NodeWindow();
 var window = nodeWindow.runHTML(`
-    <html>>
-        <head>
+    <html>
+        <head class="node">
             <title></title>
         </head>
 
         <body>
             <div id="id1">xxxxxxxxxxxxxxxxxx</div>
             <script type="text/javascript">console.log('ok')</script>
+            <p class="node"></p>
+            <div class="node"></div>
         </body>
     </html>
 `, {}, {});
@@ -136,6 +139,15 @@ describe('Element', function() {
 
         assert.equal('<div>', div.childNodes[0].getAttribute('data-p'));
     });
+
+    it('should return correct attribute', function() {
+        var div = document.createElement('div');
+
+        div.innerHTML = '<p id="2">xxx</p>';
+
+
+        assert.equal('2', div.childNodes[0].id);
+    });
   });
 
   describe('setAttribute', function() {
@@ -180,7 +192,6 @@ describe('Element', function() {
         var div2 = document.createElement('div');
 
         div.insertBefore(div2, div.childNodes[0]);
-        console.log(div.childNodes[0].tagName);
         assert.equal('DIV', div.childNodes[0].tagName);
         assert.equal('P', div.childNodes[1].tagName);
 
@@ -207,7 +218,62 @@ describe('Element', function() {
   describe('getElementById', function() {
     it('should return correct element with id', function() {
         var el = document.getElementById('id1');
-        chai.expect(el).to.exist;
+        expect(el).to.exist;
+
+        expect(el).to.have.deep.property('id', 'id1');
+
+    });
+  });
+
+
+ describe('getElementsByClassName', function() {
+    it('should return correct elements', function() {
+        var result = document.getElementsByClassName('node');
+        expect(result).to.exist;
+
+        assert.equal(3, result.length);
+
+    });
+  });
+
+
+  describe('getElementsByTagName', function() {
+    it('should return correct elements', function() {
+        var div = document.createElement('div');
+
+        div.innerHTML = `
+            <div>
+                <p id='1'></p>
+                <p id='2'></p>
+            </div>
+        `;
+        var result = div.getElementsByTagName('p');
+        expect(result).to.exist;
+
+        assert.equal(2, result.length);
+
+    });
+  });
+
+  describe('contains', function() {
+
+    it('should return correct elements', function() {
+        var div = document.createElement('div');
+
+        div.innerHTML = `
+            <div>
+                <p id='1'></p>
+                <p id='2'></p>
+            </div>
+
+            <p id="f1"></p>
+        `;
+
+        assert.equal(true, div.contains(div));
+
+        assert.equal(true, div.contains(div.getElementsByTagName('p')[0]));
+        assert.equal(false, div.getElementsByTagName('p')[2].contains(div));
+
 
     });
   });

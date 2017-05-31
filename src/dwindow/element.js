@@ -225,6 +225,55 @@ class Element extends Node{
         this.attributes.removeNamedItem(attr);
     }
 
+    getElementsByClassName(className){
+        var result = [];
+        if(this.childNodes.length){
+            for(var i = 0; i < this.childNodes.length; i ++){
+                var _node = this.childNodes[i];
+
+
+                if(_node.nodeType === _node.ELEMENT_NODE){
+                    if(_node.classList && _node.classList.contains(className)){
+                        result.push(_node);
+                    }
+
+                    result = result.concat(_node.getElementsByClassName(className));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    getElementsByTagName(tagName){
+        if(typeof tagName !== 'string'){
+            throw new Error('getElementsByTagName first argument to be string!');
+        }
+
+
+        var result = [];
+
+        tagName = tagName.toLowerCase();
+
+        if(this.childNodes.length){
+            for(var i = 0; i < this.childNodes.length; i ++){
+                var _node = this.childNodes[i];
+
+                if(_node.nodeType === _node.ELEMENT_NODE){
+                    var nodeTagName = (_node.tagName || '').toLowerCase();
+                    if(nodeTagName === tagName || tagName === "*"){
+                        result.push(_node);
+                    }
+
+                    result = result.concat(_node.getElementsByTagName(tagName));
+                }
+            }
+        }
+
+        return result;
+     }
+
+
 }
 
 module.exports = Element;

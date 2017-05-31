@@ -94,14 +94,19 @@ class Node extends EventTarget{
      }
      
      contains(node){
-        var flag = 0;
+        if(node === this){
+            return true;
+        }
+
+        var flag = false;
+
+
         for(var i = 0; i < this.childNodes.length; i ++){
             var child = this.childNodes[i];
 
-            if(child === node){
-                flag = 1;
-            }else{
-                child.contains(node);
+            if(child.contains(node)){
+                flag = true;
+                break;
             }
         }
 

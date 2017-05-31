@@ -60,7 +60,42 @@ class Document extends Node{
         return this.__defaultView;
     }
 
-    getElementById(){
+    getElementById(id){
+        var result;
+        var findChild = function(node){
+            if(result){
+                return;
+            }
+
+            for(var i = 0;i < node.childNodes.length; i ++){
+                var _node = node.childNodes[i];
+                var _id = _node.id;
+
+                if(_id == id){
+                    result = node.childNodes[i];
+                    break;
+                }
+
+                if(_node.childNodes && _node.childNodes.length){
+                    findChild(_node);
+                }
+            }
+
+
+        };
+
+        findChild(this);
+
+        return result;
+    }
+
+
+    getElementsByClassName(className){
+        return this.documentElement.getElementsByClassName(className);
+    }
+
+    getElementsByTagName(tagName){
+        return this.documentElement.getElementsByTagName(tagName);
     }
 }
 

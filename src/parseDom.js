@@ -144,10 +144,9 @@ class ParseDom{
 
         var docTree = result.docTree;
 
-        var htmlNode = result.htmlNode || document.createElement('html');
         var headNode = result.headNode || document.createElement('head');
 
-        var bodyNode;
+        var bodyNode, htmlNode;
 
         if(result.bodyNode){
             bodyNode = result.bodyNode;
@@ -160,21 +159,24 @@ class ParseDom{
             });
         }
 
+        if(! result.htmlNode){
+            htmlNode= document.createElement('html');
+
+            htmlNode.childNodes.push(headNode);
+            htmlNode.childNodes.push(bodyNode);
+        }else{
+            htmlNode = result.htmlNode;
+        }
+
         var tree = new Tree();
         tree.push(document);
         tree.goNext();
 
         tree.push(htmlNode);
 
-        tree.goNext();
-
-        tree.push(headNode);
-        tree.push(bodyNode);
-
         document.documentElement = htmlNode;
         document.head = headNode;
         document.body = bodyNode;
-
 
         // check docTree
 
