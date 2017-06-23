@@ -59,8 +59,9 @@ class ParseDom{
                     if(currNode.getAttribute('type') && (currNode.getAttribute("type") + '').toLowerCase() !== "text/javascript"){
                     }else{
                         if(currNode.getAttribute("src")  && currNode.tagName === 'script'){
-                            var attrValue = currNode.getAttribute("src");
-                            var content = windowSpace.drequire(attrValue);
+                           // @这里注释掉是直出不希望再执行, 使用sodajs会碰到
+                           // var attrValue = currNode.getAttribute("src");
+                           // var content = windowSpace.drequire(attrValue);
 
                         }
                     }
