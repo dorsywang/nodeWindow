@@ -7,14 +7,18 @@ class Text extends Node{
         this.nodeValue = text || '';
     }
 
+    _getEnscapeValue(value){
+        return value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
     // non-standard method
     get outerHTML(){
-        return this.nodeValue || '';
+        return this._getEnscapeValue(this.nodeValue || '');
     }
 
     // non-standard method
     get innerHTML(){
-        return this.nodeValue || '';
+        return this._getEnscapeValue(this.nodeValue || '');
     }
 }
 

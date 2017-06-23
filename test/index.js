@@ -291,5 +291,23 @@ describe('Element', function() {
     });
   
   });
+
+
+  describe('set text and safe output', function() {
+
+    it('should return escaped text', function() {
+        var text = document.createTextNode();
+
+        text.nodeValue = '<h1>ok</h1>';
+
+        var div = document.createElement('div');
+
+        div.appendChild(text);
+
+        assert.equal('<h1>ok</h1>',  text.nodeValue);
+        assert.equal('&lt;h1&gt;ok&lt;/h1&gt;',  div.innerHTML);
+    });
+  
+  });
 });
 

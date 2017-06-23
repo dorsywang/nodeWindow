@@ -3,7 +3,7 @@ class LocalStorage{
     }
 
     clear(){
-    },
+    }
     setItem(){
     }
 
