@@ -26,6 +26,8 @@ class NamedNodeMap{
             for(var i = index; i < this.length; i ++){
                 this[i] = this[i + 1];
             }
+
+            delete this[name];
         }
     }
 

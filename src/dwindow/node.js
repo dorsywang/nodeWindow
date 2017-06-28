@@ -131,9 +131,11 @@ class Node extends EventTarget{
 
        removeChild(node){
 
-          for(var i = 0; i < this.childNodes.length; i ++){
+            for(var i = 0; i < this.childNodes.length; i ++){
                 if(this.childNodes[i] === node){
                     this.childNodes.splice(i, 1);
+
+                    node.parentNode = null;
                     break;
                 }
             }

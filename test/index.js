@@ -161,6 +161,21 @@ describe('Element', function() {
     });
   });
 
+
+  describe('removeAttribute', function() {
+    it('should return correct attribute', function() {
+        var div = document.createElement('div');
+
+        div.setAttribute('style', 'background-color: red;');
+        div.removeAttribute('style');
+
+        var attr = div.getAttribute('style');
+
+        expect(attr).to.be.null;
+    });
+  });
+
+
  describe('getCommentNode', function() {
     it('should return correct node', function() {
         var div = document.createElement('div');
@@ -255,6 +270,22 @@ describe('Element', function() {
     });
   });
 
+  describe('removeChild', function() {
+    it('should return correct elements', function() {
+        var div = document.createElement('div');
+
+        div.innerHTML = `<p id='1'></p><p id='2'></p>`;
+
+        var child = div.childNodes[0];
+
+        child.parentNode.removeChild(child);
+
+        assert.notEqual(child, div[0]);
+
+        expect(child.parentNode).to.be.null;
+    });
+  });
+
   describe('contains', function() {
 
     it('should return correct elements', function() {
@@ -306,7 +337,32 @@ describe('Element', function() {
 
         assert.equal('<h1>ok</h1>',  text.nodeValue);
         assert.equal('&lt;h1&gt;ok&lt;/h1&gt;',  div.innerHTML);
+
+        /*
+        var t = '<h1><sdf</h1>';
+
+        div.innerHTML = t;
+        console.log(div.innerHTML);
+
+        assert.equal('<h1>&lt;</h1>',  div.innerHTML);
+        */
     });
+
+
+    it('should not return escaped text', function() {
+        var script= document.createElement('script');
+
+        var text = "<>";
+        var textNode = document.createTextNode();
+
+        textNode.nodeValue = text;
+
+
+        script.appendChild(textNode);
+
+        assert.equal(text,  script.innerHTML);
+    });
+  
   
   });
 });

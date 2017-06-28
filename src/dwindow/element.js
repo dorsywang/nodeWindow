@@ -21,6 +21,12 @@ var parseCssText = function(style, val){
 };
 
 
+var getEnscapeValue = function(value){
+    return value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+};
+
+var donotEnscapeTagReg = /script|pre|code/;
+
 class Element extends Node{
     constructor(tagName){
         super();
@@ -73,12 +79,22 @@ class Element extends Node{
 
     get innerHTML(){
 
-        var tagName = this.tagName;
+        var tagName = (this.tagName || '').toLowerCase();
         var html = "";
 
         if(this.childNodes && this.childNodes.length){
             for(var i = 0; i < this.childNodes.length; i ++){
-                html += this.childNodes[i].outerHTML;
+                var child = this.childNodes[i];
+
+                if(child.nodeType === this.TEXT_NODE){
+                    if(donotEnscapeTagReg.test(tagName)){
+                        html += child.nodeValue;
+                    }else{
+                        html += getEnscapeValue(child.nodeValue);
+                    }
+                }else{
+                    html += child.outerHTML;
+                }
             }
         }else{
         }
@@ -180,7 +196,17 @@ class Element extends Node{
             html = "<" + tagName + attrStr + ">";
             if(this.childNodes){
                 for(var i = 0; i < this.childNodes.length; i ++){
-                    html += this.childNodes[i].outerHTML;
+                    var child = this.childNodes[i];
+
+                    if(child.nodeType === this.TEXT_NODE){
+                        if(donotEnscapeTagReg.test(tagName)){
+                            html += child.nodeValue;
+                        }else{
+                            html += getEnscapeValue(child.nodeValue);
+                        }
+                    }else{
+                        html += child.outerHTML;
+                    }
                 }
             }
 
@@ -204,9 +230,9 @@ class Element extends Node{
         var item = this.attributes.getNamedItem(attr);
         
         if(item){
-            return item.value || '';
+            return item.value || null;
         }else{
-            return '';
+            return null;
         }
     }
 
