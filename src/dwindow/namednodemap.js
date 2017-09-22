@@ -37,19 +37,19 @@ class NamedNodeMap{
 
         if(attr){
             attr.name = name;
-            attr.nodeValue = value || '';
-            attr.value = value || '';
+            attr.nodeValue = value;
+            attr.value = value;
 
-            attr.firstChild.value = value || '';
-            attr.firstChild.nodeValue = value || '';
+            attr.firstChild.value = value;
+            attr.firstChild.nodeValue = value;
         }else{
 
             this[this.length ++] = {
                 name: name,
-                value: value || '',
+                value: value,
                 ownerElment: this.ownerElment,
                 nodeType: this.ownerElment.ATTRIBUTE_NODE,
-                nodeValue: value || '',
+                nodeValue: value,
                 childNodes: function(){
                     var node = _this.ownerElment.ownerDocument.createTextNode();
                     return [node];

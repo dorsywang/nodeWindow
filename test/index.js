@@ -148,6 +148,7 @@ describe('Element', function() {
 
         assert.equal('2', div.childNodes[0].id);
     });
+
   });
 
   describe('setAttribute', function() {
@@ -159,6 +160,17 @@ describe('Element', function() {
 
         assert.equal('background-color: red;', div.getAttribute('style'));
     });
+
+    it('should return correct attribute', function() {
+        var div = document.createElement('div');
+
+        div.setAttribute('autofocus', 0);
+
+
+        assert.equal(0, div.getAttribute('autofocus'));
+        assert.equal('<div autofocus="0"></div>', div.outerHTML);
+    });
+
   });
 
 

@@ -2,6 +2,10 @@ var Node = require('./node');
 var NamedNodeMap = require('./namednodemap');
 var DOMTokenList = require('./domtokenlist');
 
+var exist = function(value){
+    return value !== null && value !== undefined && value !== "" && typeof value !== 'undefined';
+};
+
 var parseCssText = function(style, val){
      // 解析css
      if(val){
@@ -135,7 +139,7 @@ class Element extends Node{
                         continue;
                     }
 
-                    attrArr.push(attrName + "=\"" + (this.attributes[i].value || '') + "\"");
+                    attrArr.push(attrName + "=\"" + (exist(this.attributes[i].value) ? this.attributes[i].value : '') + "\"");
                 }
                 
             }
@@ -230,7 +234,7 @@ class Element extends Node{
         var item = this.attributes.getNamedItem(attr);
         
         if(item){
-            return item.value || null;
+            return item.value;
         }else{
             return null;
         }

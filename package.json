@@ -1,6 +1,6 @@
 {
   "name": "nodewindow",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "description": "run browser code in node ",
   "main": "./src/nodeWindow.js",
   "directories": {
